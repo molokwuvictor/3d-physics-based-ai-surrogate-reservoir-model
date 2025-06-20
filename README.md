@@ -94,30 +94,30 @@ graph TB
 1. **PVT Model (Model 3)**
    - Uses the pressure output from Model 1 as input.
    - Calculates fluid properties based on pressure values.
-   - Utilized automatic differentiation (AD) to compute fluid property derivatives with respect to pressure.
+   - Utilizes automatic differentiation (AD) to compute fluid property derivatives with respect to pressure.
    - Incorporates polynomial fitting or parametric spline interpolation methods to approximate fluid properties.
    - This component is not trained by default.
 
 2. **Well Rate & BHP Model**
    - Handles well rate and bottom-hole pressure calculations.
-   - incorporates a well blocking factor to handle viscosity-compressibility effects in highly compressible inner boundary flow.
+   - Incorporates a well blocking factor to handle viscosity-compressibility effects in highly compressible inner boundary flow.
    - Used during training and inference; contrains no trainable parameters, hence layer is fast.
 
 3. **Physics Loss**
    - Custom loss function that enforces physics-based constraints.
-   - adaptable to single and two-phase flow problems by changing the configuration settings.
+   - Adaptable to single and two-phase flow problems by changing the configuration settings.
    - Guides the training of Models 1, 1*, and 2.
 
 ## Data Flow
 1. Input tensor flows into both Model 1 (Encoder-Decoder) and Model 2 (Residual Network).
-2. Model 1 produces pressure output which is used directly and also fed to Model 3 (PVT).
-3. Model 2 produces time step output.
-4. Model 3 calculates fluid properties from pressure values.
+2. Model 1 computes pressure output which is used directly and also fed to Model 3 (PVT).
+3. Model 2 computes a variable time step output.
+4. Model 3 computes fluid properties from pressure output.
 5. All outputs flow into the combined training process.
 
 ## Technical Details
-- Input shape typically includes batch size, temporal dimension, spatial dimensions (height, width), and channels.
-- The trained components (green) have weights that are updated during backpropagation.
+- Input shape typically includes spatial property (e.g., permeability, well position indices), temporal dimension, 3D spatial dimensions (height, width, depth), and channels. The spatial property and temporal dimension are woven to give a spatiotemporal dimensional input, which is trained by batching.
+- The trained components (green) have trainable weights and biases (variables) that are updated during training.
 - The untrained components (red) have fixed weights and parameters.
 - Physics-based constraints are integrated into the loss function as penalty terms to regularize the model.
 
