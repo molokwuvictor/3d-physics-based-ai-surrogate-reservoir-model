@@ -312,7 +312,7 @@ DEFAULT_SIMDATA_PROCESS_CONFIG = {
 DEFAULT_OPTIMIZER_CONFIGS = {
     'pressure': {
         'type': 'adamw',
-        'learning_rate': 0.01,
+        'learning_rate': 0.001,
         'beta_1': 0.9,
         'beta_2': 0.999,
         'weight_decay': 0.00005,
@@ -321,7 +321,7 @@ DEFAULT_OPTIMIZER_CONFIGS = {
             'enabled': True,              # Master switch for all decay
             'learning_rate': {
                 'enabled': True,          # Enable learning rate decay
-                'decay_steps': 50,       # Steps between decay applications
+                'decay_steps': 25,       # Steps between decay applications
                 'decay_rate': 0.90,       # Multiplicative factor (0.96 = 96% of previous value)
             },
             'weight_decay': {
@@ -333,7 +333,7 @@ DEFAULT_OPTIMIZER_CONFIGS = {
     },
     'time_step': {
         'type': 'adam',
-        'learning_rate': 0.0001,
+         'learning_rate': 0.0001,
         'beta_1': 0.9,
         'beta_2': 0.999,
         'weight_decay': 0.00001,
@@ -342,7 +342,7 @@ DEFAULT_OPTIMIZER_CONFIGS = {
             'enabled': True,              # Master switch for all decay
             'learning_rate': {
                 'enabled': True,          # Enable learning rate decay
-                'decay_steps': 50,       # Steps between decay applications
+                'decay_steps': 25,       # Steps between decay applications
                 'decay_rate': 0.90,       # Multiplicative factor (0.96 = 96% of previous value)
             },
             'weight_decay': {

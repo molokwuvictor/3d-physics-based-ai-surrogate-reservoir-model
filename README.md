@@ -84,7 +84,7 @@ graph TB
     - Does not use a hard layer since time steps can be randomly distributed.
     - Consists of multiple residual blocks with skip connections for transfer learning.
     
-3. **Optional Encoder-Decoder without Hard Layer (Model 1*)**
+3. **Optional Encoder-Decoder without Hard Layer (Model 1S)**
     - Optional layer responsible for predicting saturation values in multi-phase flow problems.
     - follows the same architecture as Model 1.
 
@@ -104,7 +104,7 @@ graph TB
 3. **Physics Loss**
    - Custom loss function that enforces physics-based constraints.
    - Adaptable to single and two-phase flow problems by changing the configuration settings.
-   - Guides the training of Models 1, 1*, and 2.
+   - Guides the training of Models 1, 1S, and 2.
 
 ## Data Flow
 1. Input tensor flows into both Model 1 (Encoder-Decoder) and Model 2 (Residual Network).
