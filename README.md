@@ -19,12 +19,10 @@ graph TB
         Hard["HardLayer<br>- Enforces Initial Conditions<br>- Physical Constraints"]
         
         Complete1["CompleteTrainableModule<br>(network_type='encoder_decoder')"]
-        
-        ED_Model --> Hard
-        
+               
         Input --> Complete1
         Complete1 --> ED_Model
-        ED_Model --> M1_Output["Pressure Output"]
+        ED_Model --> Hard --> M1_Output["Pressure Output"]
     end
     
     %% Model 2: Residual Neural Network WITHOUT Hard Layer
