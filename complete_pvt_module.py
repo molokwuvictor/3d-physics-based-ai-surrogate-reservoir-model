@@ -15,17 +15,15 @@ import sys
 import data_processing as dp
 from default_configurations import get_configuration
 
-# Add directory to path to import model classes
-current_dir = os.path.dirname(os.path.abspath(__file__))
-if current_dir not in sys.path:
-    sys.path.append(current_dir)
-    
 from Hard_Layer_Subclassed import HardLayer
 from PVT_Layer_Subclassed import PVTLayer
 
+# Add directory to path to import model classes or use working directory
+current_dir = os.path.dirname(os.path.abspath(__file__))
+if current_dir not in sys.path:
+    sys.path.append(current_dir)
+
 # Do not load PVT data here - will load on-demand when needed
-
-
 class PVTModuleWithHardLayer(tf.keras.layers.Layer):
     """
     Complete module that integrates HardLayer and PVTLayer.
