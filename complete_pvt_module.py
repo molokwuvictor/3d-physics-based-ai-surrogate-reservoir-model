@@ -114,11 +114,11 @@ class PVTModuleWithHardLayer(tf.keras.layers.Layer):
         updated_pvt_config = deep_update(default_pvt_config, self.pvt_layer_config)
         
         # Remove keys not accepted by PVTLayer constructor
-        # allowed_keys = {'fluid_type', 'fitting_method', 'polynomial_config', 'spline_config', 'spline_order', 'regularization_weight', 'name'}
-        # filtered_pvt_config = {k: v for k, v in updated_pvt_config.items() if k in allowed_keys}
+        allowed_keys = {'fluid_type', 'fitting_method', 'polynomial_config', 'spline_config', 'spline_order', 'regularization_weight', 'name', 'min_input_threshold'}
+        filtered_pvt_config = {k: v for k, v in updated_pvt_config.items() if k in allowed_keys}
 
         # Initialize the PVT layer
-        self.pvt_layer = PVTLayer(**updated_pvt_config)
+        self.pvt_layer = PVTLayer(**filtered_pvt_config)
         
         # Build PVT layer
         self.pvt_layer.build(input_shape)

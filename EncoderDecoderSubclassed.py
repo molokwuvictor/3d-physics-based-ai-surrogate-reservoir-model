@@ -7,7 +7,7 @@ layer subclassing approach. It supports:
 - Temporal dimensions
 - Non-power of two input dimensions
 - Skip connections
-- Customizable network width and depth
+- Customizable to specific network width and depth
 """
 
 import tensorflow as tf
@@ -581,7 +581,7 @@ class DecoderLayer(tf.keras.layers.Layer):
                     x = self.dense_starting_layer(x)
             if i > 0:
                 x = self.deconv_layers[i](x)
-            #tf.print("Transposed_Layer", i, "- x shape:", tf.shape(x))
+
             # Apply skip connection if available 
             if skip_connections and (self.depth - i) in skip_connections:
                 skip = skip_connections[self.depth - i]
@@ -646,7 +646,7 @@ class DecoderLayer(tf.keras.layers.Layer):
             
             # Check if dimensions need to be adjusted
             if target_shape != current_shape:
-                tf.print("Before final conv - Input shape:", target_shape, "Current shape:", current_shape)
+                debug_print("Before final conv - Input shape:", target_shape, "Current shape:", current_shape)
                 
                 # Use resize operation for 2D data
                 if self.spatial_dims == 2:
@@ -675,7 +675,7 @@ class DecoderLayer(tf.keras.layers.Layer):
                 
                 # Use padding/cropping approach for 3D data
                 else:
-                    tf.print("Resizing 3D output to match input dimensions...")
+                    debug_print("Resizing 3D output to match input dimensions...")
                     
                     # Get target and current dimensions
                     depth, height, width = target_shape
@@ -716,7 +716,7 @@ class DecoderLayer(tf.keras.layers.Layer):
                             paddings = [[0, 0], [pad_before, pad_after], [0, 0], [0, 0], [0, 0]]
                             x = tf.pad(x, paddings)
                 
-                tf.print("After resize - Shape:", tf.shape(x))
+                debug_print("After resize - Shape:", tf.shape(x))
         
         # Apply extra convolution layers if configured
         if self.num_extra_layers > 0:
