@@ -110,9 +110,10 @@ class HardLayer(tf.keras.layers.Layer):
         Args:
             input_shape: Shape of the input tensor(s)
         """
+
         # Initialize kernel exponent as a trainable variable with constraints
         self.kernel_exponent = self.add_weight(
-            shape=(1,),
+            shape=(*input_shape[0][1:-1],1),
             initializer=tf.constant_initializer(value=self.kernel_exponent_config.get('initial_value', 0.5)),
             constraint=tf.keras.constraints.MinMaxNorm(
                 min_value=self.kernel_exponent_config.get('min_value', 0.01),
