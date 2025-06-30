@@ -5,13 +5,14 @@
 #
 # This module provides an efficient and trainable residual network layer that can be
 # built with either CNN layers or Dense layers. In the dense mode the layers operate
-# on the last dimension so that the input can be multidimensional (e.g., [39, 39, 1])
-# without flattening. Two separate activation functions are supported for the hidden 
-# layers and for the output layer. When latent output is enabled, the latent sample is 
-# rescaled based on user-specified limits a and b, and the stacked tensor is broadcast 
-# to match the spatial dimensions of the feature map.
-#
-# Now with support for temporal dimensions to handle inputs with shape (None, T, H, W, C).
+# on the innermost dimension so that the input can be multidimensional (e.g., [39, 39, 1])
+# without flattening. Two separate activation functions used for the hidden layers and the output layer.
+# When latent output is enabled, the latent sample is rescaled based on user-specified limits a and b,
+# and the stacked tensor is broadcast to match the spatial dimensions of the feature map.
+# It also supports a temporal dimension to handle 3D inputs with shape (None, T, H, W, C).
+# This performs a 2D convolution, and uses same filter across the temporal dimension,
+# where the temporal dimension is the first dimension and corresponds to the thickness of the
+# the feature map.
 
 import tensorflow as tf
 import numpy as np

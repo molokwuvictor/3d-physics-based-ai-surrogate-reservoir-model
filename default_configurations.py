@@ -53,13 +53,13 @@ DEFAULT_GENERAL_CONFIG = {
     # Added for tensor splitting
     'split_keys': ['train', 'val', 'test'],
     'split_axis': [0,1],             # single or multi-axis to split indices
-    'split_ratio': {0:(0.7, 0., 0.3),1:(0.7, 0., 0.3)},  # split ratios corresponding to the mult axis - split keys (train, val, test)
+    'split_ratio': {0:(0.3, 0., 0.7),1:(0.7, 0., 0.3)},  # split ratios corresponding to the permeability time multi axis - split keys (train, val, test)
     'split_sampling_method':'random',                    # Samping method for the split - sequential or random
     # Option for physics or non-physics mode
     'physics_mode_fraction':1.,       # Physics mode fraction of 1 is pure physics - no training data snapshot is used
     
     # Fluid type
-    'fluid_type': 'DG',                 # Dry Gas (DG) or Gas Condensate (GC)
+    'fluid_type': 'GC',                 # Dry Gas (DG) or Gas Condensate (GC)
     'pvt_fitting_method': 'spline',      # 'spline' or 'polynomial'
 
     # Define default weights for gas and oil phases
@@ -135,9 +135,9 @@ DEFAULT_RESERVOIR_CONFIG = {
 DEFAULT_WELLS_CONFIG = {
     'connections': [
         {'name': 'P1', 'i': 29, 'j': 29, 'k': 0, 'type': 'producer', 'control': 'ORAT', 'value': 500.0, 'minimum_bhp': 1000.0, 'wellbore_radius': 0.09525, 'completion_ratio':0.5, 'shutin_days': [[1000.0, 0.0]]},
-        {'name': 'P2', 'i': 29, 'j': 9, 'k': 0, 'type': 'producer', 'control': 'ORAT', 'value': 10000.0, 'minimum_bhp': 1000.0,'wellbore_radius': 0.09525, 'completion_ratio':0.5, 'shutin_days': [[1000.0, 0.0]]},
-        {'name': 'P3', 'i': 9, 'j': 9, 'k': 0, 'type': 'producer', 'control': 'ORAT', 'value': 1500.0, 'minimum_bhp': 1000.0,'wellbore_radius': 0.09525, 'completion_ratio':0.5, 'shutin_days': [[1000.0, 0.0]]},
-        {'name': 'P4', 'i': 9, 'j': 29, 'k': 0, 'type': 'producer', 'control': 'ORAT', 'value': 2000.0, 'minimum_bhp': 1000.0,'wellbore_radius': 0.09525, 'completion_ratio':0.5, 'shutin_days': [[1000.0, 0.0]]},
+        {'name': 'P2', 'i': 29, 'j': 9, 'k': 0, 'type': 'producer', 'control': 'ORAT', 'value': 1000.0, 'minimum_bhp': 1000.0,'wellbore_radius': 0.09525, 'completion_ratio':0.5, 'shutin_days': [[1000.0, 0.0]]},        # 10000
+        {'name': 'P3', 'i': 9, 'j': 9, 'k': 0, 'type': 'producer', 'control': 'ORAT', 'value': 500.0, 'minimum_bhp': 1000.0,'wellbore_radius': 0.09525, 'completion_ratio':0.5, 'shutin_days': [[1000.0, 0.0]]},          # 1500
+        {'name': 'P4', 'i': 9, 'j': 29, 'k': 0, 'type': 'producer', 'control': 'ORAT', 'value': 1000.0, 'minimum_bhp': 1000.0,'wellbore_radius': 0.09525, 'completion_ratio':0.5, 'shutin_days': [[1000.0, 0.0]]},        # 2000
         {'name': 'I1', 'i': 19, 'j': 19, 'k': 0, 'type': 'injector', 'control': 'ORAT', 'value': 0., 'minimum_bhp': 1000.0,'wellbore_radius': 0.09525, 'completion_ratio':0.5, 'shutin_days': [[1000.0, 0.0]]}
     ],
 }
@@ -213,7 +213,8 @@ DEFAULT_HARD_LAYER_CONFIG = {
         'max_value': 0.99
     },
     'use_rbf': False,  # Default is no RBF
-    'regularization': 0.001
+    'regularization': 0.001,
+    'rectifier': None
 }
 
 # Default configuration for input slicing
@@ -312,7 +313,7 @@ DEFAULT_SIMDATA_PROCESS_CONFIG = {
 DEFAULT_OPTIMIZER_CONFIGS = {
     'pressure': {
         'type': 'adamw',
-        'learning_rate': 0.001,
+        'learning_rate': 0.005,
         'beta_1': 0.9,
         'beta_2': 0.999,
         'weight_decay': 0.00005,

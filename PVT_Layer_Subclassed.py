@@ -165,8 +165,7 @@ class PVTLayer(tf.keras.layers.Layer):
         inputs_safe = tf.maximum(inputs, self.min_input_threshold)
         # Then ensure below max threshold
         inputs_safe = tf.minimum(inputs_safe, self.max_input_threshold)
-
-        
+       
         # Number of properties
         n_properties = len(self.properties)
         
@@ -259,7 +258,7 @@ class PVTLayer(tf.keras.layers.Layer):
         # Evaluate polynomial and derivative
         value_flat = poly_eval(x_flat, coeffs_tensor)
         deriv_flat = poly_deriv(x_flat, coeffs_tensor)
-        
+
         # Reshape back to original shape
         value = tf.reshape(value_flat, orig_shape)
         deriv = tf.reshape(deriv_flat, orig_shape)
