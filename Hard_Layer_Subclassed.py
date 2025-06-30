@@ -7,20 +7,17 @@ mathematical transformations on the input data.
 
 import tensorflow as tf
 import numpy as np
+import os
+import sys
 
-# Import custom modules (assuming this exists in the codebase)
+# Import custom modules and configurations
+from default_configurations import get_configuration, WORKING_DIRECTORY, DEFAULT_GENERAL_CONFIG, DEFAULT_RESERVOIR_CONFIG
 try:
-    from Main_Library.New_Methods import base_layer as bl
+    current_dir = os.path.dirname(WORKING_DIRECTORY)
+    if current_dir not in sys.path:
+        sys.path.append(current_dir)
 except ImportError:
-    try:
-        import base_layer as bl
-    except ImportError:
-        # Define a placeholder if the module isn't available
-        class DummyBL:
-            @staticmethod
-            def nonormalize(*args, **kwargs):
-                return args[1]
-        bl = DummyBL()
+    raise ImportError("Critical error: default_configurations module not found. Cannot continue execution.")
 
 class HardLayer(tf.keras.layers.Layer):
     """
@@ -31,7 +28,7 @@ class HardLayer(tf.keras.layers.Layer):
     a single model with different optimizers.
     """
     def __init__(self,
-                 norm_limits=[-1, 1],    # Normalization limits for inputs
+                 norm_limits=[-1, 1],               # Normalization limits for inputs
                  init_value=None,                    # Initial value for hard enforcement
                  dim_slices=None,                    # Dictionary of slices for dimensions
                  nonormalize_func=None,              # Function to unnormalize data
@@ -45,7 +42,9 @@ class HardLayer(tf.keras.layers.Layer):
                  rbf_config=None,                    # RBF configuration
                  kernel_activation=None,             # Activation for kernel computation
                  input_activation=None,              # Activation for input
+                 rectifier=None,                     # Rectifier for gas condensate fluid above dew point
                  regularization=0.0,                 # Regularization parameter
+                 pvt_config=None,                    # PVT configuration including fluid_type and parameters
                  name='hard_layer',
                  **kwargs):
         """
@@ -62,6 +61,7 @@ class HardLayer(tf.keras.layers.Layer):
             kernel_activation: Activation function(s) for kernel calculations
             input_activation: Activation function for input
             regularization: Regularization parameter
+            pvt_config: PVT configuration including fluid_type and parameters
             name: Name for the layer
         """
         super(HardLayer, self).__init__(name=name, **kwargs)
@@ -100,8 +100,29 @@ class HardLayer(tf.keras.layers.Layer):
         
         self.input_activation = input_activation
         
-        # Initialize kernel parameters
+        # Initialize kernel parameters for radial basis function
         self._kernel_initializer = tf.keras.initializers.get('glorot_normal')
+
+        # Rectifier configuration
+        self.rectifier = rectifier
+
+        # Get fluid type from default config
+        self.fluid_type = DEFAULT_GENERAL_CONFIG['fluid_type']
+        if self.fluid_type == 'GC':
+            breakpoint()
+            self.pmax = DEFAULT_RESERVOIR_CONFIG['initialization']['Pi']
+            self.pmin = DEFAULT_RESERVOIR_CONFIG['initialization']['Pa']           
+        
+        # PVT configuration
+        # If pvt_config is None, get it from default configurations
+        if pvt_config is None:
+            # Get PVT configuration for this fluid type
+            self.pvt_config = get_configuration('pvt_layer', fluid_type=self.fluid_type, fitting_method='spline')
+        else:
+            self.pvt_config = pvt_config
+
+        # Extract key PVT (dew point) properties
+        self.pdew = self.pvt_config['dew_point'] if self.fluid_type == 'GC' else None
 
     def build(self, input_shape):
         """
@@ -134,6 +155,10 @@ class HardLayer(tf.keras.layers.Layer):
         # Set up input activation
         if (self.input_activation is None) or (hasattr(self.input_activation, 'lower')):
             self.input_activation = lambda x: x
+        
+        # Set up rectifier - default to a relu activation function
+        if self.fluid_type == 'GC' and self.rectifier is None:
+            self.rectifier = tf.nn.relu
         
         # Initialize RBF layers if needed
         if self.use_rbf:
@@ -191,11 +216,15 @@ class HardLayer(tf.keras.layers.Layer):
         
         # Apply time normalization
         alpha_t = ((t1 - self.norm_limits[0]) / (self.norm_limits[1] - self.norm_limits[0]))
-        alpha = (alpha_t)
+
+        # Add a rectifying function to the time-changing variable for gas condensate fluid above dew point
+        if self.fluid_type == 'GC' and self.rectifier is not None:
+            alpha_p = self.rectifier((p-self.pdew)/(self.pmin-self.pdew))
+        else:
+            alpha_p = 1.0
 
         # Apply exponentiation with trainable parameter
-
-        alpha = alpha ** self.kernel_activation[-1](self.kernel_exponent)
+        alpha = alpha_p * alpha_t ** self.kernel_activation[-1](self.kernel_exponent)
 
         # Apply property modification if using RBF
         if self.use_rbf:
@@ -228,6 +257,9 @@ class HardLayer(tf.keras.layers.Layer):
             'kernel_exponent_config': self.kernel_exponent_config,
             'use_rbf': self.use_rbf,
             'rbf_config': self.rbf_config,
-            'regularization': self.regularization
+            'regularization': self.regularization,
+            'pvt_config': self.pvt_config,
+            'rectifier': self.rectifier,
+            # Don't include fluid_type, pmax, pmin, pdew as they're derived from pvt_config or defaults
         })
         return config
