@@ -109,7 +109,6 @@ class HardLayer(tf.keras.layers.Layer):
         # Get fluid type from default config
         self.fluid_type = DEFAULT_GENERAL_CONFIG['fluid_type']
         if self.fluid_type == 'GC':
-            breakpoint()
             self.pmax = DEFAULT_RESERVOIR_CONFIG['initialization']['Pi']
             self.pmin = DEFAULT_RESERVOIR_CONFIG['initialization']['Pa']           
         

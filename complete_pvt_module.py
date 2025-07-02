@@ -80,7 +80,7 @@ class PVTModuleWithHardLayer(tf.keras.layers.Layer):
             # Update with user-provided configuration
             if self.hard_layer_config:
                 default_hard_config.update(self.hard_layer_config)
-            
+                
             # Initialize the hard layer
             self.hard_layer = HardLayer(**default_hard_config)
             

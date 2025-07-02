@@ -60,7 +60,8 @@ DEFAULT_GENERAL_CONFIG = {
     
     # Fluid type
     'fluid_type': 'GC',                 # Dry Gas (DG) or Gas Condensate (GC)
-    'pvt_fitting_method': 'spline',      # 'spline' or 'polynomial'
+    'above_dew_point': True,            # Whether to use a simple hard enforcement (above dew point conditions) or a deep learning based hard enforcement (below dew point conditions)
+    'pvt_fitting_method': 'spline',     # 'spline' or 'polynomial'
 
     # Define default weights for gas and oil phases
     'default_weights': {
