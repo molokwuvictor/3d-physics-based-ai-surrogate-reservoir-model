@@ -152,7 +152,7 @@ class CompleteTrainableModule(tf.keras.layers.Layer):
         """
         # If using hard_enforcement_only mode, skip the main network processing
         if self.hard_enforcement_only:
-            network_output = inputs  # Pass inputs directly to hard layer
+            network_output = tf.reduce_mean(inputs[...,-2:], axis=-1, keepdims=True)  # Pass a reduced inner dimension of inputs directly to hard layer
         else:
             # Process input through the main network
             network_output = self.main_network(inputs, training=training)
