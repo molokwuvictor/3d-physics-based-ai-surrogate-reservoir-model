@@ -30,6 +30,9 @@ class CompleteTrainableModule(tf.keras.layers.Layer):
     1. An encoder-decoder network, or
     2. A residual neural network
     with an optional hard layer. The architecture can be configured based on user preference.
+    
+    When hard_enforcement_only=True, only the hard enforcement layer will be used
+    without any deep learning layers (encoder-decoder or residual network).
     """
     def __init__(self, 
                  network_type='encoder_decoder',  # 'encoder_decoder' or 'residual'
@@ -38,6 +41,7 @@ class CompleteTrainableModule(tf.keras.layers.Layer):
                  use_hard_layer=True,
                  hard_layer_config=None,
                  input_slice_config=None,
+                 hard_enforcement_only=False,  # New param: When True, only use hard layer with no DL networks
                  **kwargs):
         """
         Initialize the complete trainable module.
@@ -59,6 +63,7 @@ class CompleteTrainableModule(tf.keras.layers.Layer):
         self.residual_network_config = residual_network_config or {}
         self.hard_layer_config = hard_layer_config or {}
         self.use_hard_layer = use_hard_layer
+        self.hard_enforcement_only = hard_enforcement_only
         
         # Configure how inputs should be sliced for each component
         self.input_slice_config = input_slice_config or get_configuration('input_slice')
@@ -74,35 +79,40 @@ class CompleteTrainableModule(tf.keras.layers.Layer):
         Args:
             input_shape: Shape of the input tensor
         """
-        # Initialize the neural network based on type
-        if self.network_type == 'encoder_decoder':
-            # Create encoder-decoder with default parameters
-            default_ed_config = get_configuration('encoder_decoder', input_shape)
-            
-            # Update with user-provided configuration
-            if self.encoder_decoder_config:
-                default_ed_config.update(self.encoder_decoder_config)
-            
-            # Initialize the encoder-decoder
-            self.main_network = EncoderDecoderModel(**default_ed_config)
-            # Store the network type for parameter tracking
-            self.main_network_type = 'encoder_decoder'
-            
-        else:  # residual network
-            # Create residual network with default parameters
-            default_res_config = get_configuration('residual')
-            
-            # Update with user-provided configuration
-            if self.residual_network_config:
-                default_res_config.update(self.residual_network_config)
-            
-            # Initialize the residual network
-            self.main_network = ResidualNetworkLayer(**default_res_config)
-            # Store the network type for parameter tracking
-            self.main_network_type = 'residual'
+        # Initialize the neural network based on type (skip if hard_enforcement_only is True)
+        if not self.hard_enforcement_only:
+            if self.network_type == 'encoder_decoder':
+                # Create encoder-decoder with default parameters
+                default_ed_config = get_configuration('encoder_decoder', input_shape)
+                
+                # Update with user-provided configuration
+                if self.encoder_decoder_config:
+                    default_ed_config.update(self.encoder_decoder_config)
+                
+                # Initialize the encoder-decoder
+                self.main_network = EncoderDecoderModel(**default_ed_config)
+                # Store the network type for parameter tracking
+                self.main_network_type = 'encoder_decoder'
+                
+            else:  # residual network
+                # Create residual network with default parameters
+                default_res_config = get_configuration('residual')
+                
+                # Update with user-provided configuration
+                if self.residual_network_config:
+                    default_res_config.update(self.residual_network_config)
+                
+                # Initialize the residual network
+                self.main_network = ResidualNetworkLayer(**default_res_config)
+                # Store the network type for parameter tracking
+                self.main_network_type = 'residual'
+        else:
+            # For hard_enforcement_only mode, no neural network is created
+            self.main_network = None
+            self.main_network_type = 'none'
         
-        # Initialize and build the hard layer if enabled
-        if self.use_hard_layer:
+        # Initialize and build the hard layer if enabled or if using hard_enforcement_only mode
+        if self.use_hard_layer or self.hard_enforcement_only:
             # Create default hard layer configuration
             default_hard_config = get_configuration('hard_layer', use_rbf=False)
             
@@ -123,7 +133,7 @@ class CompleteTrainableModule(tf.keras.layers.Layer):
             self.hard_layer.build(hard_layer_input_shape)
             
         # Create trainable weights groups for separate optimization
-        self.main_network_trainable = []
+        self.main_network_trainable = [] if not self.hard_enforcement_only else None
         self.hard_layer_trainable = []
         
         # Call the parent's build method
@@ -140,12 +150,16 @@ class CompleteTrainableModule(tf.keras.layers.Layer):
         Returns:
             Module output (either main network output or hard layer output)
         """
-        # Process input through the main network
-        network_output = self.main_network(inputs, training=training)
-        
-        # If hard layer is not enabled, return main network output
-        if not self.use_hard_layer:
-            return network_output
+        # If using hard_enforcement_only mode, skip the main network processing
+        if self.hard_enforcement_only:
+            network_output = inputs  # Pass inputs directly to hard layer
+        else:
+            # Process input through the main network
+            network_output = self.main_network(inputs, training=training)
+            
+            # If hard layer is not enabled, return main network output
+            if not self.use_hard_layer:
+                return network_output
             
         # Otherwise, process through hard layer
         # Extract variables for hard layer
@@ -179,7 +193,8 @@ class CompleteTrainableModule(tf.keras.layers.Layer):
             'residual_network_config': self.residual_network_config,
             'use_hard_layer': self.use_hard_layer,
             'hard_layer_config': self.hard_layer_config,
-            'input_slice_config': self.input_slice_config
+            'input_slice_config': self.input_slice_config,
+            'hard_enforcement_only': self.hard_enforcement_only
         })
         return config
 
