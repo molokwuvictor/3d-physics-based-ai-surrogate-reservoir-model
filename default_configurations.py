@@ -135,11 +135,11 @@ DEFAULT_RESERVOIR_CONFIG = {
 # if start_time must be less than end_time for a shut-in period to be valid. if start_time is greater than end_time, it implies no shut-in period
 DEFAULT_WELLS_CONFIG = {
     'connections': [
-        {'name': 'P1', 'i': 29, 'j': 29, 'k': 0, 'type': 'producer', 'control': 'ORAT', 'value': 500.0, 'minimum_bhp': 1000.0, 'wellbore_radius': 0.09525, 'completion_ratio':0.5, 'shutin_days': [[1000.0, 0.0]]},
-        {'name': 'P2', 'i': 29, 'j': 9, 'k': 0, 'type': 'producer', 'control': 'ORAT', 'value': 1000.0, 'minimum_bhp': 1000.0,'wellbore_radius': 0.09525, 'completion_ratio':0.5, 'shutin_days': [[1000.0, 0.0]]},        # 10000
-        {'name': 'P3', 'i': 9, 'j': 9, 'k': 0, 'type': 'producer', 'control': 'ORAT', 'value': 500.0, 'minimum_bhp': 1000.0,'wellbore_radius': 0.09525, 'completion_ratio':0.5, 'shutin_days': [[1000.0, 0.0]]},          # 1500
-        {'name': 'P4', 'i': 9, 'j': 29, 'k': 0, 'type': 'producer', 'control': 'ORAT', 'value': 1000.0, 'minimum_bhp': 1000.0,'wellbore_radius': 0.09525, 'completion_ratio':0.5, 'shutin_days': [[1000.0, 0.0]]},        # 2000
-        {'name': 'I1', 'i': 19, 'j': 19, 'k': 0, 'type': 'injector', 'control': 'ORAT', 'value': 0., 'minimum_bhp': 1000.0,'wellbore_radius': 0.09525, 'completion_ratio':0.5, 'shutin_days': [[1000.0, 0.0]]}
+        {'name': 'P1', 'i': 29, 'j': 29, 'k': 0, 'type': 'producer', 'control': 'ORAT', 'value': 500.0, 'minimum_bhp': 4100.0, 'wellbore_radius': 0.09525, 'completion_ratio':0.5, 'shutin_days': [[1000.0, 0.0]]},
+        {'name': 'P2', 'i': 29, 'j': 9, 'k': 0, 'type': 'producer', 'control': 'ORAT', 'value': 1000.0, 'minimum_bhp': 4100.0,'wellbore_radius': 0.09525, 'completion_ratio':0.5, 'shutin_days': [[1000.0, 0.0]]},        # 10000
+        {'name': 'P3', 'i': 9, 'j': 9, 'k': 0, 'type': 'producer', 'control': 'ORAT', 'value': 500.0, 'minimum_bhp': 4100.0,'wellbore_radius': 0.09525, 'completion_ratio':0.5, 'shutin_days': [[1000.0, 0.0]]},          # 1500
+        {'name': 'P4', 'i': 9, 'j': 29, 'k': 0, 'type': 'producer', 'control': 'ORAT', 'value': 1000.0, 'minimum_bhp': 4100.0,'wellbore_radius': 0.09525, 'completion_ratio':0.5, 'shutin_days': [[1000.0, 0.0]]},        # 2000
+        {'name': 'I1', 'i': 19, 'j': 19, 'k': 0, 'type': 'injector', 'control': 'ORAT', 'value': 0., 'minimum_bhp': 4100.0,'wellbore_radius': 0.09525, 'completion_ratio':0.5, 'shutin_days': [[1000.0, 0.0]]}
     ],
 }
 

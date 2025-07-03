@@ -154,11 +154,7 @@ class HardLayer(tf.keras.layers.Layer):
         # Set up input activation
         if (self.input_activation is None) or (hasattr(self.input_activation, 'lower')):
             self.input_activation = lambda x: x
-        
-        # Set up rectifier - default to a relu activation function
-        if self.fluid_type == 'GC' and self.rectifier is None:
-            self.rectifier = tf.nn.relu
-        
+               
         # Initialize RBF layers if needed
         if self.use_rbf:
             activation_fn = None
@@ -196,6 +192,12 @@ class HardLayer(tf.keras.layers.Layer):
         # and inputs[1] to be the output from encoder-decoder
         input_vars = inputs[0]
         p = inputs[1]
+
+        # Initialize rect_input as None by default
+        rect_input = None
+        # Check if rectifier is configured AND if we have a third input
+        if self.rectifier is not None and len(inputs) > 2:
+            rect_input = inputs[2]
         
         # Apply slice to inner dimension
         if isinstance(input_vars, list):
@@ -217,8 +219,8 @@ class HardLayer(tf.keras.layers.Layer):
         alpha_t = ((t1 - self.norm_limits[0]) / (self.norm_limits[1] - self.norm_limits[0]))
 
         # Add a rectifying function to the time-changing variable for gas condensate fluid above dew point
-        if self.fluid_type == 'GC' and self.rectifier is not None:
-            alpha_p = self.rectifier((p-self.pdew)/(self.pmin-self.pdew))
+        if self.rectifier is not None and len(inputs) > 2:
+            alpha_p = self.rectifier((rect_input-self.pdew)/(self.pmin-self.pdew))
         else:
             alpha_p = 1.0
 
