@@ -139,7 +139,7 @@ class CompleteTrainableModule(tf.keras.layers.Layer):
         # Call the parent's build method
         super(CompleteTrainableModule, self).build(input_shape)
     
-    def call(self, inputs, training=False):
+    def call(self, inputs, rectifier_input=None, training=False):
         """
         Forward pass through the module.
         
@@ -175,7 +175,10 @@ class CompleteTrainableModule(tf.keras.layers.Layer):
             hard_layer_inputs = [time, property_val]
         
         # Process through hard layer
-        output = self.hard_layer([hard_layer_inputs, network_output], training=training)
+        if rectifier_input is not None and self.hard_layer_config['rectifier'] is not None:
+            output = self.hard_layer([hard_layer_inputs, network_output, rectifier_input], training=training)
+        else:
+            output = self.hard_layer([hard_layer_inputs, network_output], training=training)
         
         return output
     
