@@ -408,64 +408,6 @@ def validate_loss_keys(
         f"Mismatch between number of loss keys ({n_loss_keys}) and number of y_batch keys ({n_y_keys}) in non-physics mode."
     )
 
-# Build model map and training loop
-def build_model_map(input_shape, optimizer_model_names_map=None, fluid_type=None):
-    """
-    Build all required models using input shape derived from training data, including well_rate_bhp and (for GC) saturation model.
-    Returns model_map.
-    optimizer_model_names_map is used to build the models
-    Example: optimizer_model_names_map = {
-                                          'pressure': 'encoder_decoder',
-                                          'time_step': 'residual_network',
-                                          'fluid_property': 'pvt_model',
-                                          'well_rate_bhp': 'well_rate_bhp_model',
-                                          'saturation': 'saturation_model',
-                                          }
-    """
-    # Get input shape from the shape of the training data
-    # Given the training data shape is (K, T, D, H, W, C), the shape is (None, D, H, W, C)
-    # K and T dimensions are the permeability-time dimensions obtained from weaving which is 
-    # combined to a single dimension and split during batching
-
-    input_shape = (None, *input_shape[2:])
-    logging.info(f"Input shape inferred from training data: {input_shape}")
-
-    # Always build main models
-    
-    main_model = build_encoder_decoder_with_hard(input_shape=input_shape)
-    #main_model = build_residual_network_with_hard(input_shape=input_shape)
-    time_step_model = build_residual_network_without_hard(input_shape=input_shape)
-    pvt_model = build_pvt_model_without_hard(main_model)
-    well_rate_bhp_model = WellRatesPressure()
-
-    # Determine fluid type
-    if fluid_type is None:
-        fluid_type = DEFAULT_GENERAL_CONFIG.get('fluid_type', 'DG')
-
-    # Build saturation model for GC
-    saturation_model = None
-    if fluid_type == 'GC':
-        saturation_model = build_encoder_decoder_with_hard(input_shape=input_shape, name="saturation_model")
-
-    # Build model map
-    model_map = {
-        'pressure': main_model,
-        'time_step': time_step_model,
-        'pvt_model': pvt_model,
-        'well_rate_bhp_model': well_rate_bhp_model,
-    }
-    if fluid_type == 'GC' and saturation_model is not None:
-        model_map['saturation_model'] = saturation_model
-
-    # Log model summaries
-    logging.info("\n" + "="*50)
-    logging.info("MODEL ARCHITECTURE SUMMARY")
-    logging.info("="*50)
-    for name, model in model_map.items():
-        logging.info(f"Model: {name}")
-
-    return model_map
-
 def watch_losses_and_log_variables(
     epoch,
     avg_losses_train,
