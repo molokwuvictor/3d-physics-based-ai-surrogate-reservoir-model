@@ -841,7 +841,8 @@ def run_pipeline_from_config(config: dict) -> None:
 
 if __name__ == "__main__":
     # Unified configuration dictionary with direct assignments
-    sim_folder = r'C:\Users\User\Documents\PHD_HW_Machine_Learning\ML_Cases_2025\Main_Library\New Methods\KL_Realizations\Simulations_39x39x1_R200_a75670de'
+    # sim_folder is user specific
+    sim_folder = r'C:\Users\User\Documents\PHD_HW_Machine_Learning\ML_Cases_2025\Main_Library\New Methods\Static and Dynamic Properties\KLE_39x39x1_R200_bebaba68f1d01eb0\dat_files_test_bebaba68f1d01eb0\dynamic'
     unified_config = {
         "simulation_pipeline": {
             "enabled": True,
