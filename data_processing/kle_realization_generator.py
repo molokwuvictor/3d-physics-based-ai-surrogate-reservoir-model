@@ -45,7 +45,7 @@ class NumpyEncoder(json.JSONEncoder):
         return super(NumpyEncoder, self).default(obj)
 
 # Import the KL expansion module
-from KL_expansion import generate_kl_log_normal_real_params_3D
+from kl_expansion import generate_kl_log_normal_real_params_3D
 
 # Configuration class for KL expansion
 class KLConfig:
