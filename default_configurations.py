@@ -12,14 +12,6 @@ import numpy as np
 # Define working directory
 WORKING_DIRECTORY = "C:/Users/User/Documents/PHD_HW_Machine_Learning/ML_Cases_2025/Main_Library/New Methods"
 
-# Try to import data_processing for spline data
-try:
-    sys.path.append(WORKING_DIRECTORY)
-    import data_processing as dp
-except ImportError:
-    print("Warning: data_processing module not found. Spline fitting will not be available.")
-    dp = None
-
 # Default general settings
 DEFAULT_GENERAL_CONFIG = {
     'save_compressed': False,  # Whether to save compressed versions of numpy arrays
@@ -541,6 +533,10 @@ def get_configuration(config_type, input_shape=None, use_rbf=False, fluid_type=N
         raise ValueError(f"Unknown configuration type: {config_type}. " 
                          f"Valid types: encoder_decoder, residual, hard_layer, input_slice, pvt_layer, pvt_module")
 
+# load_dataframe and DataSummary initially non-existent
+# Lazy import - they will only be imported in the load_spline_data function when needed
+load_dataframe = None
+DataSummary = None
 # Function to load spline data
 def load_spline_data():
     """
@@ -549,16 +545,19 @@ def load_spline_data():
     Returns:
         spline_config: DataSummary object containing spline data or None if loading fails
     """
-    if dp is None:
-        print("Warning: data_processing module not available, cannot load spline data")
-        return None
-    
+    # Dynamically import the modules when needed to avoid circular imports
     try:
-        # Explicitly set the path to the New Methods directory
-        new_methods_dir = os.path.dirname(os.path.abspath(__file__))
-        _pvt_data = dp.load_dataframe(filename='pvt_data', filetype='df', load_dir=new_methods_dir)
-        spline_config = dp.DataSummary(data_list=[_pvt_data,], dtype=DEFAULT_GENERAL_CONFIG['dtype'] )
-        return spline_config
-    except Exception as e:
-        print(f"Warning: Failed to load PVT data for spline fitting: {str(e)}")
+        # Try to import the needed functions directly
+        from data_processing.data_processing_utils import load_dataframe, DataSummary
+        
+        try:
+            _pvt_data = load_dataframe(filename='pvt_data', filetype='df', load_dir=WORKING_DIRECTORY)
+            spline_config = DataSummary(data_list=[_pvt_data], dtype=DEFAULT_GENERAL_CONFIG['dtype'])
+            return spline_config
+        except Exception as e:
+            print(f"Warning: Failed to load PVT data for spline fitting: {str(e)}")
+            return None
+            
+    except ImportError:
+        print("Warning: data_processing module not available, cannot load spline data")
         return None
