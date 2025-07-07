@@ -31,15 +31,15 @@ from .srm_data_processing import (
     validate_split_ratios
 )
 
-# Import from KL_expansion.py
-from .KL_expansion import (
+# Import from kl_expansion.py
+from .kl_expansion import (
     generate_kl_log_normal_real_params_3D,
     plot_realizations_3D,
     plot_model_3d_grid
 )
 
-# Import from KLE_realization_generator.py
-from .KLE_realization_generator import (
+# Import from kle_realization_generator.py
+from .kle_realization_generator import (
     KLConfig,
     NumpyEncoder,
     generate_full_config_hash,
