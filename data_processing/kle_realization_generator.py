@@ -22,10 +22,11 @@ from datetime import datetime
 import hashlib
 import warnings
 
-# Add the main library path to sys.path
-main_library_path = os.path.abspath(os.path.dirname(__file__))
-if main_library_path not in sys.path:
-    sys.path.insert(0, main_library_path)
+# Add the working directory to the system path for importing default configurations
+# working directory is two levels up from this script
+working_directory = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if working_directory not in sys.path:
+    sys.path.append(working_directory)
 
 # Import default configurations upfront
 from default_configurations import WORKING_DIRECTORY, DEFAULT_RESERVOIR_CONFIG, DEFAULT_GENERAL_CONFIG, DEFAULT_WELLS_CONFIG, DEFAULT_SCAL_CONFIG, get_configuration

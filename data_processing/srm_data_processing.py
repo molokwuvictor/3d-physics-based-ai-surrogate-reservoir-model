@@ -15,14 +15,15 @@ import logging
 # Set up logging to show INFO level by default
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# Add the current directory to the system path for importing default configurations
-current_dir = os.path.dirname(os.path.abspath(__file__))
-if current_dir not in sys.path:
-    sys.path.append(current_dir)
+# Add the working directory to the system path for importing default configurations
+# working directory is two levels up from this script
+working_directory = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if working_directory not in sys.path:
+    sys.path.append(working_directory)
 
 try:
     from default_configurations import WORKING_DIRECTORY, DEFAULT_GENERAL_CONFIG, DEFAULT_RESERVOIR_CONFIG, DEFAULT_WELLS_CONFIG, DEFAULT_SCAL_CONFIG, DEFAULT_SIMDATA_PROCESS_CONFIG
-    from data_processing import create_positional_grids, DataSummary, weave_tensors, align_and_trim_pair_lists, split_tensor_sequence, slice_statistics
+    from data_processing_utils import create_positional_grids, DataSummary, weave_tensors, align_and_trim_pair_lists, split_tensor_sequence, slice_statistics
     from simulation_data_process_pipeline import run_pipeline_from_config
 except ImportError as e:
     logging.error(f"ERROR: Could not import required modules: {e}")
@@ -109,7 +110,7 @@ class SRMDataProcessor:
         Returns:
             list: [readable_name, config_hash]
         """
-        from kl_realizations_generator import generate_full_config_hash
+        from kle_realization_generator import generate_full_config_hash
         from default_configurations import get_configuration
         config_str, config_hash = generate_full_config_hash(
             self.general_config,
@@ -648,7 +649,6 @@ class SRMDataProcessor:
         statistics, stats_path = self.save_training_statistics(initial_train_groups, train_config_hash, raw_data_keys=raw_data_keys)
         
         # Create DataSummary from the statistics for normalization
-        from data_processing import DataSummary
         data_summary = DataSummary([statistics], dtype=self.dtype)
         
         # Get normalization configuration from DEFAULT_GENERAL_CONFIG
