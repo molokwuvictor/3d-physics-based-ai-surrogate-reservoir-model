@@ -14,9 +14,9 @@ import sys
 import logging
 
 # Add parent directory to path
-parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-if parent_dir not in sys.path:
-    sys.path.insert(0, parent_dir)
+project_directory = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if project_directory not in sys.path:
+    sys.path.insert(0, project_directory)
 
 # Suppress TensorFlow logs
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
@@ -38,8 +38,8 @@ import numpy as np
 import sys
 import pickle
 import time
-from srm_data_processing import SRMDataProcessor
 
+from data_processing import SRMDataProcessor
 from training import BatchGenerator, build_optimizer_from_config, validate_loss_keys
 from default_configurations import get_optimizer_config, get_configuration, get_optimizer_model_mapping, WORKING_DIRECTORY, DEFAULT_GENERAL_CONFIG, DEFAULT_RESERVOIR_CONFIG
 from physics_loss_Subclassed import PhysicsLoss
@@ -214,7 +214,7 @@ def build_pvt_model_without_hard(input_model, name="pvt_model_only"):
     # Get configurations - use spline method as requested
     # The get_configuration function now handles loading spline data internally
     logging.info("Configuring PVT Layer with spline fitting method")
-    pvt_layer_config = get_configuration('pvt_layer', fluid_type='DG', fitting_method='spline')
+    pvt_layer_config = get_configuration('pvt_layer', fluid_type=DEFAULT_GENERAL_CONFIG['fluid_type'], fitting_method='spline')
     pvt_layer_config['spline_order']=1
     # pvt_layer_config['min_input_threshold'] = -30000
 

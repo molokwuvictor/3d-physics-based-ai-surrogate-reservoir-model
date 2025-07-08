@@ -12,17 +12,15 @@ import os
 import sys
 from uuid import uuid4
 
-# Add current directory to path for imports
-current_dir = os.path.dirname(os.path.abspath(__file__))
-if current_dir not in sys.path:
-    sys.path.append(current_dir)
-
 from default_configurations import get_configuration, get_conversion_constants, WORKING_DIRECTORY, DEFAULT_GENERAL_CONFIG, DEFAULT_RESERVOIR_CONFIG, DEFAULT_WELLS_CONFIG, DEFAULT_SCAL_CONFIG
 from complete_pvt_module import PVTModuleWithHardLayer
 from relative_permeability import RelativePermeability
 from welldata_processor import WellDataProcessor
-from data_processing import DataSummary, slice_tensor
-from srm_data_processing import SRMDataProcessor
+
+project_directory = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if project_directory not in sys.path:
+    sys.path.append(project_directory)
+from data_processing import DataSummary, slice_tensor, SRMDataProcessor
 
 logging.basicConfig(level=logging.INFO)
 
@@ -344,7 +342,7 @@ class WellRatesPressure:
             None
         """
         if method_dir is None:
-            method_dir = current_dir
+            method_dir = project_directory
         # Get the full shape of tensor_history_stacked
         full_shape = tf.shape(tensor_history_stacked)
         

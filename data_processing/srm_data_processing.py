@@ -15,26 +15,21 @@ import logging
 # Set up logging to show INFO level by default
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# Add the working directory to the system path for importing default configurations
-# working directory is two levels up from this script
-working_directory = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-if working_directory not in sys.path:
-    sys.path.append(working_directory)
-
 try:
+    from default_configurations import WORKING_DIRECTORY, DEFAULT_GENERAL_CONFIG, DEFAULT_RESERVOIR_CONFIG, DEFAULT_WELLS_CONFIG, DEFAULT_SCAL_CONFIG, DEFAULT_SIMDATA_PROCESS_CONFIG
+    from .data_processing_utils import create_positional_grids, DataSummary, weave_tensors, align_and_trim_pair_lists, split_tensor_sequence, slice_statistics
+    from .simulation_data_process_pipeline import run_pipeline_from_config
+    from .kle_realization_generator import generate_full_config_hash
+except ImportError as e:    
+    logging.error(f"ERROR: Could not import using relative import: {e}")
+    logging.info("Module directory is added to the sys path")
+    project_directory = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    if project_directory not in sys.path:
+        sys.path.append(project_directory)
     from default_configurations import WORKING_DIRECTORY, DEFAULT_GENERAL_CONFIG, DEFAULT_RESERVOIR_CONFIG, DEFAULT_WELLS_CONFIG, DEFAULT_SCAL_CONFIG, DEFAULT_SIMDATA_PROCESS_CONFIG
     from data_processing_utils import create_positional_grids, DataSummary, weave_tensors, align_and_trim_pair_lists, split_tensor_sequence, slice_statistics
     from simulation_data_process_pipeline import run_pipeline_from_config
-except ImportError as e:
-    logging.error(f"ERROR: Could not import required modules: {e}")
-    logging.info("Make sure default_configurations.py and data_processing.py exist in the same directory.")
-    WORKING_DIRECTORY = None
-    DEFAULT_GENERAL_CONFIG = None
-    DEFAULT_RESERVOIR_CONFIG = None
-    DEFAULT_WELLS_CONFIG = None
-    DEFAULT_SCAL_CONFIG = None
-    DEFAULT_SIMDATA_PROCESS_CONFIG = None
-
+    from kle_realization_generator import generate_full_config_hash
 
 class SRMDataProcessor:
     """Class for processing data for Surrogate Reservoir Models (SRM) based on default configurations."""
@@ -110,7 +105,6 @@ class SRMDataProcessor:
         Returns:
             list: [readable_name, config_hash]
         """
-        from kle_realization_generator import generate_full_config_hash
         from default_configurations import get_configuration
         config_str, config_hash = generate_full_config_hash(
             self.general_config,
