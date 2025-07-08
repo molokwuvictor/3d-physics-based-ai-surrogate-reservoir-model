@@ -31,6 +31,8 @@ if working_directory not in sys.path:
 # Import default configurations upfront
 from default_configurations import WORKING_DIRECTORY, DEFAULT_RESERVOIR_CONFIG, DEFAULT_GENERAL_CONFIG, DEFAULT_WELLS_CONFIG, DEFAULT_SCAL_CONFIG, get_configuration
 
+# Import the KL expansion module
+from data_processing.kl_expansion import generate_kl_log_normal_real_params_3D
 
 # Custom JSON encoder for NumPy types
 class NumpyEncoder(json.JSONEncoder):
@@ -43,9 +45,6 @@ class NumpyEncoder(json.JSONEncoder):
         elif isinstance(obj, np.ndarray):
             return obj.tolist()
         return super(NumpyEncoder, self).default(obj)
-
-# Import the KL expansion module
-from kl_expansion import generate_kl_log_normal_real_params_3D
 
 # Configuration class for KL expansion
 class KLConfig:
