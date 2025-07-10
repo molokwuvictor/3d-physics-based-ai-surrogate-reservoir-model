@@ -8,9 +8,13 @@ import tensorflow as tf
 import os
 import sys
 import numpy as np
+from dotenv import load_dotenv
 
-# Define working directory
-WORKING_DIRECTORY = "C:/Users/User/Documents/PHD_HW_Machine_Learning/ML_Cases_2025/Main_Library/New Methods"
+# Load environment variables from .env file
+load_dotenv()
+
+# Define working directory from environment
+WORKING_DIRECTORY = os.getenv("WORKING_DIRECTORY")
 
 # Default general settings
 DEFAULT_GENERAL_CONFIG = {
