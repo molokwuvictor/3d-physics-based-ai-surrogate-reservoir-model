@@ -15,18 +15,25 @@ import logging
 # Set up logging to show INFO level by default
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
+from dotenv import load_dotenv
+load_dotenv()
+
+# Define working directory from environment
+WORKING_DIRECTORY = os.getenv("WORKING_DIRECTORY")
+
+# Add working directory to sys.path
+if WORKING_DIRECTORY not in sys.path:
+    sys.path.append(WORKING_DIRECTORY)
+
+from default_configurations import DEFAULT_GENERAL_CONFIG, DEFAULT_RESERVOIR_CONFIG, DEFAULT_WELLS_CONFIG, DEFAULT_SCAL_CONFIG, DEFAULT_SIMDATA_PROCESS_CONFIG
 try:
-    from default_configurations import WORKING_DIRECTORY, DEFAULT_GENERAL_CONFIG, DEFAULT_RESERVOIR_CONFIG, DEFAULT_WELLS_CONFIG, DEFAULT_SCAL_CONFIG, DEFAULT_SIMDATA_PROCESS_CONFIG
     from .data_processing_utils import create_positional_grids, DataSummary, weave_tensors, align_and_trim_pair_lists, split_tensor_sequence, slice_statistics
     from .simulation_data_process_pipeline import run_pipeline_from_config
     from .kle_realization_generator import generate_full_config_hash
-except ImportError as e:    
+except ImportError as e:
+    # When run as a script, the relative import fails    
     logging.error(f"ERROR: Could not import using relative import: {e}")
     logging.info("Module directory is added to the sys path")
-    project_directory = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    if project_directory not in sys.path:
-        sys.path.append(project_directory)
-    from default_configurations import WORKING_DIRECTORY, DEFAULT_GENERAL_CONFIG, DEFAULT_RESERVOIR_CONFIG, DEFAULT_WELLS_CONFIG, DEFAULT_SCAL_CONFIG, DEFAULT_SIMDATA_PROCESS_CONFIG
     from data_processing_utils import create_positional_grids, DataSummary, weave_tensors, align_and_trim_pair_lists, split_tensor_sequence, slice_statistics
     from simulation_data_process_pipeline import run_pipeline_from_config
     from kle_realization_generator import generate_full_config_hash
